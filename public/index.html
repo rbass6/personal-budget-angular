@@ -103,7 +103,7 @@
             <section class="text-box">
                 <h1>Free</h1>
                 <p>
-                    This app is free!!! And you are the only one holding your data!
+                    <canvas id="myChart"></canvas>
                 </p>
             </section>
 
@@ -118,5 +118,34 @@
         </div>
     </footer>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.5.0/axios.min.js" integrity="sha512-aoTNnqZcT8B4AmeCFmiSnDlc4Nj/KPaZyB5G7JnOnUEkdNpCZs1LCankiYi01sLTyWy+m2P+W4XM+BuQ3Q4/Dg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+      var data = {
+        datasets: [
+          {
+            data: [30, 350, 90],
+            backgroundColor: [
+              '#ffcd56',
+              '#ff6384',
+              '#36a2eb',
+              '#fd6b19'
+            ]
+          }
+        ],
+        labels: [
+          'Eat out',
+          'Rent',
+          'Groceries'
+        ]
+      }
+
+      const ctx = document.getElementById('myChart');
+
+      new Chart(ctx, {
+        type: 'pie',
+        data: data
+      });
+    </script>
 </body>
 </html>
