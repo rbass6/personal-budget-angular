@@ -98,18 +98,30 @@
                     because they know it is all good and accounted for.
                 </p>
             </section>
-                
+
             <!-- This is a Semantic HTML Change -->
             <section class="text-box">
-                <h1>Chart</h1>
+                <h1>Free</h1>
                 <p>
-                    <canvas id="myChart" width="400" height="400"></canvas>
+                    This app is free!!! And you are the only one holding your data!
                 </p>
             </section>
-
+    
         </div>
-
     </div>
+
+    <div class="chart-container">
+        <div class="chart">
+            <h1>Chart #1</h1>
+            <canvas id="myChart"></canvas>
+        </div>
+    
+        <div class="chart">
+            <h1>Chart #2</h1>
+            <div class="d3-container"></div>
+        </div>
+    </div>
+
 
     <!-- This is a Semantic HTML Change -->
     <footer class="bottom">
@@ -120,6 +132,8 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.5.0/axios.min.js" integrity="sha512-aoTNnqZcT8B4AmeCFmiSnDlc4Nj/KPaZyB5G7JnOnUEkdNpCZs1LCankiYi01sLTyWy+m2P+W4XM+BuQ3Q4/Dg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- <script src="http://d3js.org/d3.v3.min.js"></script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
     <script>
       var dataSource = {
         datasets: [
@@ -143,7 +157,6 @@
       function getBudget() {
         axios.get('/budget')
         .then(function (res) {
-            console.log(res);
             for(var i = 0; i < res.data.myBudget.length; i++) {
                 dataSource.datasets[0].data[i] = res.data.myBudget[i].budget
                 dataSource.labels[i] = res.data.myBudget[i].title;
@@ -157,6 +170,236 @@
       getBudget();
 
 
+    </script>
+
+    <script>
+
+    function getBudget() {
+        axios.get('/budget')
+        .then(function (res) {
+            var data = res.data.myBudget
+            console.log(data)
+            var width = 960;
+
+            const height = Math.min(width, 500);
+            const radius = Math.min(width, height) / 2;
+
+            const arc = d3.arc()
+                .outerRadius(radius * 0.8)
+                .innerRadius(radius * 0.4);
+
+            const outerArc = d3.arc()
+                .innerRadius(radius * 0.9)
+                .outerRadius(radius * 0.9);
+
+            const pie = d3.pie()
+                .padAngle(1 / radius)
+                .sort(null)
+                .value(d => d.budget);
+
+            const color = d3.scaleOrdinal()
+                .domain(data.map(d => d.title))
+                .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
+
+            const svg = d3.select(".d3-container")
+                .append("svg")
+                .attr("width", width)
+                .attr("height", height)
+                .attr("viewBox", [-width / 2, -height / 2, width, height])
+                .attr("style", "max-width: 100%; height: auto;");
+
+            const key = function(d) {
+                return d.data.title;
+            };
+
+            svg.append("g")
+                .attr("class", "slices")
+                .selectAll()
+                .data(pie(data))
+                .join("path")
+                .attr("fill", d => color(d.data.title))
+                .attr("d", arc)
+                .append("title")
+                .text(d => `${d.data.title}: ${d.data.budget}`);
+
+            // svg.append("g")
+            //     .attr("class", "labels")
+            //     .attr("font-family", "sans-serif")
+            //     .attr("font-size", 12)
+            //     .attr("text-anchor", "middle")
+            //     .selectAll()
+            //     .data(pie(data))
+            //     .join("text")
+            //     .attr("transform", d => `translate(${arc.centroid(d)})`)
+            //     .call(text => text.append("tspan")
+            //         .attr("y", "-0.4em")
+            //         .attr("font-weight", "bold")
+            //         .text(d => d.data.title))
+            //     .call(text => text.filter(d => (d.endAngle - d.startAngle) > 0.25).append("tspan")
+            //         .attr("x", 0)
+            //         .attr("y", "0.7em")
+            //         .attr("fill-opacity", 0.7)
+            //         .text(d => d.data.budget));
+
+            svg.append("g")
+                .attr("class", "lines")
+
+            return svg.node();
+        })
+    }
+
+    getBudget();
+    // var svg = d3.select(".d3-container")
+    //     .append("svg")
+    //     .append("g")
+    
+    // svg.append("g")
+    //     .attr("class", "slices");
+    // svg.append("g")
+    //     .attr("class", "labels");
+    // svg.append("g")
+    //     .attr("class", "lines");
+    
+    // var width = 450,
+    //     height = 450,
+    //     radius = Math.min(width, height) / 2;
+    
+    // var pie = d3.layout.pie()
+    //     .sort(null)
+    //     .value(function(d) {
+    //         return d.value;
+    //     });
+    
+    // var arc = d3.svg.arc()
+    //     .outerRadius(radius * 0.8)
+    //     .innerRadius(radius * 0.4);
+    
+    // var outerArc = d3.svg.arc()
+    //     .innerRadius(radius * 0.9)
+    //     .outerRadius(radius * 0.9);
+    
+    // svg.attr("transform", "translate(" + (width - 25) + "," + height / 2 + ")")
+    //    .attr("style", "max-width: 100%; height: auto;");
+    
+    // var key = function(d){ return d.title; };
+    
+    // var color = d3.scale.ordinal()
+    //     .domain(["Lorem ipsum", "dolor sit", "amet", "consectetur", "adipisicing", "elit", "sed", "do", "eiusmod", "tempor", "incididunt"])
+    //     .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
+    
+    // // function randomData (){
+    // //     var labels = color.domain();
+    // //     return labels.map(function(label){
+    // //         return { label: label, value: Math.random() }
+    // //     });
+    // // }
+    
+    // function getBudgetJson() {
+    //     axios.get('/budget')
+    //     .then(function (res) {
+    //         change(res.data.myBudget);
+    //     })
+    // }
+    
+    // getBudgetJson()
+    
+    // // d3.select(".randomize")
+    // //     .on("click", function(){
+    // //         change(randomData());
+    // //     });
+    
+    
+    // function change(data) {
+    //     console.log(data)
+    //     /* ------- PIE SLICES -------*/
+    //     var slice = svg.select(".slices").selectAll("path.slice")
+    //         .data(pie(data), key);
+    
+    //     slice.enter()
+    //         .insert("path")
+    //         .style("fill", function(d) { return color(d.title); })
+    //         .attr("class", "slice");
+    
+    //     slice		
+    //         .transition().duration(1000)
+    //         .attrTween("d", function(d) {
+    //             this._current = this._current || d;
+    //             var interpolate = d3.interpolate(this._current, d);
+    //             this._current = interpolate(0);
+    //             return function(t) {
+    //                 return arc(interpolate(t));
+    //             };
+    //         })
+    
+    //     slice.exit()
+    //         .remove();
+    
+    //     /* ------- TEXT LABELS -------*/
+    
+    //     var text = svg.select(".labels").selectAll("text")
+    //         .data(pie(data), key);
+    
+    //     text.enter()
+    //         .append("text")
+    //         .attr("dy", ".35em")
+    //         .text(function(d) {
+    //             return d.title;
+    //         });
+        
+    //     function midAngle(d){
+    //         return d.startAngle + (d.endAngle - d.startAngle)/2;
+    //     }
+    
+    //     text.transition().duration(1000)
+    //         .attrTween("transform", function(d) {
+    //             this._current = this._current || d;
+    //             var interpolate = d3.interpolate(this._current, d);
+    //             this._current = interpolate(0);
+    //             return function(t) {
+    //                 var d2 = interpolate(t);
+    //                 var pos = outerArc.centroid(d2);
+    //                 pos[0] = radius * (midAngle(d2) < Math.PI ? 1 : -1);
+    //                 return "translate("+ pos +")";
+    //             };
+    //         })
+    //         .styleTween("text-anchor", function(d){
+    //             this._current = this._current || d;
+    //             var interpolate = d3.interpolate(this._current, d);
+    //             this._current = interpolate(0);
+    //             return function(t) {
+    //                 var d2 = interpolate(t);
+    //                 return midAngle(d2) < Math.PI ? "start":"end";
+    //             };
+    //         });
+    
+    //     text.exit()
+    //         .remove();
+    
+    //     /* ------- SLICE TO TEXT POLYLINES -------*/
+    
+    //     var polyline = svg.select(".lines").selectAll("polyline")
+    //         .data(pie(data), key);
+        
+    //     polyline.enter()
+    //         .append("polyline");
+    
+    //     polyline.transition().duration(1000)
+    //         .attrTween("points", function(d){
+    //             this._current = this._current || d;
+    //             var interpolate = d3.interpolate(this._current, d);
+    //             this._current = interpolate(0);
+    //             return function(t) {
+    //                 var d2 = interpolate(t);
+    //                 var pos = outerArc.centroid(d2);
+    //                 pos[0] = radius * 0.95 * (midAngle(d2) < Math.PI ? 1 : -1);
+    //                 return [arc.centroid(d2), outerArc.centroid(d2), pos];
+    //             };			
+    //         });
+        
+    //     polyline.exit()
+    //         .remove();
+    // };
+    
     </script>
 </body>
 </html>
