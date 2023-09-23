@@ -152,7 +152,7 @@
       const ctx = document.getElementById('myChart');
 
       function getBudget() {
-        axios.get('/budget')
+        axios.get('http://localhost:3000/budget')
         .then(function (res) {
             for(var i = 0; i < res.data.myBudget.length; i++) {
                 dataSource.datasets[0].data[i] = res.data.myBudget[i].budget
@@ -172,7 +172,7 @@
     <script>
 
     function getBudget() {
-        axios.get('/budget')
+        axios.get('http://localhost:3000/budget')
         .then(function (res) {
             var data = res.data.myBudget
             console.log("top-level data: " + JSON.stringify(data))
